@@ -6,10 +6,17 @@
 #include "config.h"  // Include the new config header
 
 // Function prototypes
+void start_up_beep() {
+    // Beep sound for startup
+    Beep(1000, 500); // Frequency 1000 Hz for 500 ms
+}
 void boot_sequence();
 void shell_loop();
 
 int main() {
+    // Call the startup beep
+    start_up_beep();
+
     // Call the boot sequence
     boot_sequence();
 
