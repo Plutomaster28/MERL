@@ -7,9 +7,10 @@
 #define BIOS "Droplet"
 
 // Additional compile-time configuration
-#define OS_VERSION "MERL-V v0.1"
-#define ENABLE_KAIROS 1
+#define OS_VERSION "MERL v0.1"
+#define ENABLE_KAIROS 1 //might go unused
 #define MAX_USERS 8
 #define TETRA_REPO_LOCATION "./tetra_repos"
+#define SYSTEM_NAME "Micreon-16"
 
 #endif // CONFIG_H
