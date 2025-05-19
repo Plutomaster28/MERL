@@ -6,6 +6,8 @@
 #include "shell.h"
 #include "user.h"
 #include "kernel.h"
+#include "tetra.h"
+#include "color-and-test.h"
 
 // Function prototypes
 void handle_command(char *command);
@@ -45,9 +47,9 @@ void start_shell() {
 
 void sysinfo_command(int argc, char **argv) {
     printf("MERL Shell v1.0.0\n");
-    printf("Developed by: Your Team\n");
+    printf("Developed by: Tomoko Saito\n");
     printf("System: Windows\n");
-    printf("Credits: MERL Unix Replica Project\n");
+    printf("Credits: ZoraNT shell for donating its internals\n");
 }
 
 void pwd_command(int argc, char **argv) {
@@ -220,10 +222,6 @@ void pull_command(int argc, char **argv) {
     printf("No updates available.\n"); // Placeholder
 }
 
-void tetra_command(int argc, char **argv) {
-    printf("Package manager functionality not implemented yet.\n"); // Placeholder
-}
-
 void flipper_command(int argc, char **argv) {
     printf("Sub-shell switching not implemented yet.\n"); // Placeholder
 }
@@ -275,7 +273,8 @@ Command command_table[] = {
     {"kill", (void (*)(int, char **))route_command, "Terminates a process by ID."},
     {"ps", (void (*)(int, char **))route_command, "Lists all active processes."},
     {"read", (void (*)(int, char **))route_command, "Reads a file."},
-    {"write", (void (*)(int, char **))route_command, "Writes to a file."}
+    {"write", (void (*)(int, char **))route_command, "Writes to a file."},
+    {"color-and-test", color_and_test_command, "Displays colors and system info."}
 };
 const int command_table_size = sizeof(command_table) / sizeof(Command);
 
