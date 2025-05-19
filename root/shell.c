@@ -8,6 +8,7 @@
 #include "kernel.h"
 #include "tetra.h"
 #include "color-and-test.h"
+#include "config.h"
 
 // Function prototypes
 void handle_command(char *command);
@@ -46,10 +47,10 @@ void start_shell() {
 // Command implementations
 
 void sysinfo_command(int argc, char **argv) {
-    printf("MERL Shell v1.0.0\n");
+    printf("MERL Shell: %s\n", OS_VERSION);
     printf("Developed by: Tomoko Saito\n");
-    printf("System: Windows\n");
-    printf("Credits: ZoraNT shell for donating its internals\n");
+    printf("System: %s\n", SYSTEM_NAME);
+    printf("Note: Unlike Zora, this is meant to provide a unix-like experience :3\n");
 }
 
 void pwd_command(int argc, char **argv) {
