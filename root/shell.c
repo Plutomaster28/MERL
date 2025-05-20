@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <direct.h> // For Windows-specific directory functions
+#include <windows.h>
 #include "shell.h"
 #include "user.h"
 #include "kernel.h"
@@ -224,19 +225,102 @@ void pull_command(int argc, char **argv) {
 }
 
 void flipper_command(int argc, char **argv) {
-    printf("Sub-shell switching not implemented yet.\n"); // Placeholder
+    if (argc < 2) {
+        printf("Usage: flipper <subshell-program> [args...]\n");
+        printf("Example: flipper cmd\n");
+        return;
+    }
+    // Build the command string
+    char command[512] = {0};
+    for (int i = 1; i < argc; i++) {
+        strcat(command, argv[i]);
+        if (i < argc - 1) strcat(command, " ");
+    }
+    printf("Launching subshell: %s\n", command);
+    int result = system(command);
+    printf("Subshell exited (code %d). Returning to MERL shell.\n", result);
 }
 
 void search_command(int argc, char **argv) {
-    printf("Search functionality not implemented yet.\n");
+    if (argc < 2) {
+        printf("Usage: search <pattern>\n");
+        printf("Example: search *.txt\n");
+        return;
+    }
+
+    WIN32_FIND_DATA find_data;
+    HANDLE hFind = FindFirstFile(argv[1], &find_data);
+
+    if (hFind == INVALID_HANDLE_VALUE) {
+        printf("No files found matching pattern: %s\n", argv[1]);
+        return;
+    }
+
+    printf("Files matching '%s':\n", argv[1]);
+    do {
+        if (!(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+            printf("  %s\n", find_data.cFileName);
+        }
+    } while (FindNextFile(hFind, &find_data) != 0);
+
+    FindClose(hFind);
 }
 
 void edit_command(int argc, char **argv) {
-    printf("Edit functionality not implemented yet.\n");
+    if (argc < 2) {
+        printf("Usage: edit <filename>\n");
+        return;
+    }
+
+    FILE *file = fopen(argv[1], "r+");
+    if (!file) {
+        // If file doesn't exist, create it
+        file = fopen(argv[1], "w+");
+        if (!file) {
+            perror("edit");
+            return;
+        }
+        printf("Created new file: %s\n", argv[1]);
+    } else {
+        printf("Editing existing file: %s\n", argv[1]);
+        printf("Current contents:\n");
+        char buffer[256];
+        while (fgets(buffer, sizeof(buffer), file)) {
+            printf("%s", buffer);
+        }
+        rewind(file);
+    }
+
+    printf("\nEnter new content. Type a single dot (.) on a line to finish.\n");
+    char line[256];
+    freopen(argv[1], "w", file); // Overwrite file with new content
+    while (1) {
+        printf("> ");
+        if (!fgets(line, sizeof(line), stdin)) break;
+        // Remove trailing newline
+        line[strcspn(line, "\n")] = '\0';
+        if (strcmp(line, ".") == 0) break;
+        fprintf(file, "%s\n", line);
+    }
+    fclose(file);
+    printf("File saved: %s\n", argv[1]);
 }
 
 void run_command(int argc, char **argv) {
-    printf("Run functionality not implemented yet.\n");
+    if (argc < 2) {
+        printf("Usage: run <executable> [args...]\n");
+        return;
+    }
+    // Build the command string
+    char command[512] = {0};
+    for (int i = 1; i < argc; i++) {
+        strcat(command, argv[i]);
+        if (i < argc - 1) strcat(command, " ");
+    }
+    int result = system(command);
+    if (result == -1) {
+        printf("Failed to run command: %s\n", command);
+    }
 }
 
 // Command table
