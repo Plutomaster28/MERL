@@ -13,7 +13,34 @@ void start_up_beep() {
 void boot_sequence();
 void shell_loop();
 
+// Function to set a memory limit using a Windows Job Object
+void set_memory_limit_mb(SIZE_T mb) {
+    HANDLE hJob = CreateJobObject(NULL, NULL);
+    if (hJob == NULL) {
+        fprintf(stderr, "Failed to create Job Object\n");
+        exit(1);
+    }
+
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {0};
+    jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_PROCESS_MEMORY;
+    jeli.ProcessMemoryLimit = mb * 1024 * 1024;
+
+    if (!SetInformationJobObject(hJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli))) {
+        fprintf(stderr, "Failed to set memory limit\n");
+        CloseHandle(hJob);
+        exit(1);
+    }
+
+    if (!AssignProcessToJobObject(hJob, GetCurrentProcess())) {
+        fprintf(stderr, "Failed to assign process to Job Object\n");
+        CloseHandle(hJob);
+        exit(1);
+    }
+}
+
 int main() {
+    set_memory_limit_mb(TOTAL_MEMORY_MB); // Set memory limit before anything else
+
     // Call the startup beep
     start_up_beep();
 
