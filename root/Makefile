@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall
 LDFLAGS = -lws2_32
-SRCS = merl_main.c shell.c kernel.c user.c utils.c tetra.c color-and-test.c
+SRCS = merl_main.c shell.c kernel.c user.c utils.c tetra.c color-and-test.c crash.c
 OBJS = $(SRCS:.c=.o)
 TARGET = MERL.exe
 
