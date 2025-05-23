@@ -13,4 +13,11 @@
 #define TETRA_REPO_LOCATION "./tetra_repos"
 #define SYSTEM_NAME "Micreon-16"
 
+#include "crash.h"
+
+// Redirect standard memory allocation functions to safe versions
+#define malloc(size) safe_malloc(size)
+#define calloc(num, size) safe_calloc(num, size)
+#define realloc(ptr, size) safe_realloc(ptr, size)
+
 #endif // CONFIG_H
