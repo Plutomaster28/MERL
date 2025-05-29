@@ -220,8 +220,55 @@ void cat_command(int argc, char **argv) {
 }
 
 void pull_command(int argc, char **argv) {
-    printf("Checking for updates...\n");
-    printf("No updates available.\n"); // Placeholder
+    if (argc < 2) {
+        printf("Usage: pull <directory-name>\n");
+        printf("Example: pull internet\n");
+        return;
+    }
+
+    const char *goodies_repo = "https://github.com/Plutomaster28/MERL-Extended-Goodies.git";
+    const char *local_repo = "__MERL_GOODIES_TEMP__";
+    char cmd[1024];
+
+    // Step 1: Clone or update the repo
+    if (GetFileAttributesA(local_repo) == INVALID_FILE_ATTRIBUTES) {
+        printf("[pull] Cloning goodies repository...\n");
+        snprintf(cmd, sizeof(cmd), "git clone \"%s\" \"%s\"", goodies_repo, local_repo);
+        if (system(cmd) != 0) {
+            printf("[pull] Failed to clone repository.\n");
+            return;
+        }
+    } else {
+        printf("[pull] Updating goodies repository...\n");
+        snprintf(cmd, sizeof(cmd), "cd %s && git pull", local_repo);
+        if (system(cmd) != 0) {
+            printf("[pull] Failed to update repository.\n");
+            return;
+        }
+    }
+
+    // Step 2: Search for the directory
+    char src_dir[1024];
+    snprintf(src_dir, sizeof(src_dir), "%s\\%s", local_repo, argv[1]);
+    DWORD attrib = GetFileAttributesA(src_dir);
+    if (attrib == INVALID_FILE_ATTRIBUTES || !(attrib & FILE_ATTRIBUTE_DIRECTORY)) {
+        printf("[pull] Directory '%s' not found in goodies repository.\n", argv[1]);
+        return;
+    }
+
+    // Ensure etc directory exists
+    _mkdir("etc");
+
+    // Step 3: Copy the directory to the etc folder
+    char dst_dir[1024];
+    snprintf(dst_dir, sizeof(dst_dir), ".\\etc\\%s", argv[1]);
+    snprintf(cmd, sizeof(cmd), "xcopy /E /I /Y \"%s\" \"%s\"", src_dir, dst_dir);
+    printf("[pull] Copying '%s' to etc directory...\n", argv[1]);
+    if (system(cmd) == 0) {
+        printf("[pull] Successfully pulled '%s' into etc.\n", argv[1]);
+    } else {
+        printf("[pull] Failed to copy directory.\n");
+    }
 }
 
 void flipper_command(int argc, char **argv) {
@@ -348,7 +395,8 @@ Command command_table[] = {
     {"cat", cat_command, "Displays the contents of a file."},
     {"tetra", tetra_command, "Handles package management."},
     {"flipper", flipper_command, "Switches to sub-shells."},
-    {"pull", pull_command, "Checks and applies updates."},
+    {"pull", pull_command, "Takes a directory from the MERL goodies repository."},
+    {"route", route_command, "Routes commands to the appropriate handlers."},
     {"whoami", whoami_command, "Displays the current logged-in user."},
     {"useradd", useradd_command, "Adds a new user (placeholder)."},
     {"login", login_command, "Logs in as a specified user."},
