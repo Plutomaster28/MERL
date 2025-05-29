@@ -2,9 +2,9 @@
 #define KERNEL_H
 
 // Kernel-level APIs
-int fork_process();
-void kill_process(int pid);
-void list_processes();
+int fork_task(const char *desc);
+void kill_task(int pid);
+void list_tasks();
 void kernel_read(const char *filename);
 void kernel_write(const char *filename, const char *content);
 
