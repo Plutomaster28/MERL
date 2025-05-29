@@ -370,6 +370,30 @@ void run_command(int argc, char **argv) {
     }
 }
 
+// Kernel command wrappers for the shell command table
+void fork_wrapper(int argc, char **argv) {
+    route_command("fork", argc, argv);
+}
+void kill_wrapper(int argc, char **argv) {
+    route_command("kill", argc, argv);
+}
+void ps_wrapper(int argc, char **argv) {
+    route_command("ps", argc, argv);
+}
+void read_wrapper(int argc, char **argv) {
+    route_command("read", argc, argv);
+}
+void write_wrapper(int argc, char **argv) {
+    route_command("write", argc, argv);
+}
+void route_wrapper(int argc, char **argv) {
+    if (argc < 2) {
+        printf("Usage: route <kernel-command> [args...]\n");
+        return;
+    }
+    route_command(argv[1], argc - 1, argv + 1);
+}
+
 // Command table
 Command command_table[] = {
     {"man", man_command, "Displays information about commands."},
@@ -396,17 +420,17 @@ Command command_table[] = {
     {"tetra", tetra_command, "Handles package management."},
     {"flipper", flipper_command, "Switches to sub-shells."},
     {"pull", pull_command, "Takes a directory from the MERL goodies repository."},
-    {"route", route_command, "Routes commands to the appropriate handlers."},
     {"whoami", whoami_command, "Displays the current logged-in user."},
     {"useradd", useradd_command, "Adds a new user (placeholder)."},
     {"login", login_command, "Logs in as a specified user."},
     {"logout", logout_command, "Logs out the current user."},
     {"passwd", passwd_command, "Changes the password for the current user (placeholder)."},
-    {"fork", (void (*)(int, char **))route_command, "Creates a new process."},
-    {"kill", (void (*)(int, char **))route_command, "Terminates a process by ID."},
-    {"ps", (void (*)(int, char **))route_command, "Lists all active processes."},
-    {"read", (void (*)(int, char **))route_command, "Reads a file."},
-    {"write", (void (*)(int, char **))route_command, "Writes to a file."},
+    {"route", route_wrapper, "Routes commands to the appropriate handlers."},
+    {"fork", fork_wrapper, "Creates a new process."},
+    {"kill", kill_wrapper, "Terminates a process by ID."},
+    {"ps", ps_wrapper, "Lists all active processes."},
+    {"read", read_wrapper, "Reads a file."},
+    {"write", write_wrapper, "Writes to a file."},
     {"color-and-test", color_and_test_command, "Displays colors and system info."}
 };
 const int command_table_size = sizeof(command_table) / sizeof(Command);
